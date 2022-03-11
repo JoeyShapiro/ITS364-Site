@@ -4,9 +4,9 @@ const fs = require('fs');
 const serverCa = [fs.readFileSync("BaltimoreCyberTrustRoot.crt.pem", 'utf-8')];
 var config =
 {
-   host     : 'panda-diplomacy.mysql.database.azure.com',
+   host     : '<IP>',
    user     : 'redpanda',
-   password : 'Widget9-Negotiate-Swept',
+   password : '<PASSWORD>',
    database : 'fame',
    port: 3306,
    ssl: {
