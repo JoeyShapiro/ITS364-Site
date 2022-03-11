@@ -1,13 +1,16 @@
 const mysql = require('mysql2');
 const fs = require('fs');
+const { database } = require('pg/lib/defaults');
+
+var settings = JSON.parse(fs.readFileSync('secret.json', 'utf8')); // could just make this config
 
 const serverCa = [fs.readFileSync("BaltimoreCyberTrustRoot.crt.pem", 'utf-8')];
 var config =
 {
-   host     : '<IP>',
-   user     : 'redpanda',
-   password : '<PASSWORD>',
-   database : 'fame',
+   host     : settings['host'],
+   user     : settings['user'],
+   password : settings['password'],
+   database : settings['database'],
    port: 3306,
    ssl: {
         rejectUnauthorized: true,
