@@ -4,7 +4,7 @@ const { database } = require('pg/lib/defaults');
 
 var settings = JSON.parse(fs.readFileSync('secret.json', 'utf8')); // could just make this config
 
-const serverCa = [fs.readFileSync("BaltimoreCyberTrustRoot.crt.pem", 'utf-8')];
+const serverCa = [fs.readFileSync("DigiCertGlobalRootCA.crt.pem", 'utf-8')];
 var config =
 {
    host     : settings['host'],
