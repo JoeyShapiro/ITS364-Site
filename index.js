@@ -49,7 +49,8 @@ app.listen(3000, function () {
 const query = util.promisify(conn.query).bind(conn); // no idea what this does, but somehow returns result, rather than that other stuff
 
 // render the page for an artist
-function renderArtist(res) {
+function renderArtist(res, pid) {
+    console.log(pid);
     artistID = 1;
 
     (async () => {
@@ -66,7 +67,7 @@ function renderArtist(res) {
 }
 
 // render the page for a manager
-function renderManager(res) {
+function renderManager(res, pid) {
     ArtistManagerID = 1;
 
     (async () => {
@@ -79,7 +80,7 @@ function renderManager(res) {
 }
 
 // render the page for a customer
-function renderCustomer(res) {
+function renderCustomer(res, pid) {
     CustomerID = 1;
 
     (async () => {
@@ -100,26 +101,44 @@ function renderSearch(res, res_body) {
     })();
 }
 
-// GET
+function renderAdmin(res) {
+    res.render('admin');
+}
+
+function renderError(res) {
+    res.render('error');
+}
+
+// GET home
 app.get('/', function (req, res, next) {
     conn.connect();
-    pid = 1;
-    user_type = 'search';
+    res.render('home');
+});
 
-    if (user_type == 'artist')
-        renderArtist(res);
-    else if (user_type == 'manager')
-        renderManager(res);
-    else if (user_type == 'customer')
-        renderCustomer(res);
-    else if (user_type == 'search')
-        renderSearch(res, {});
-    else
-        res.render('home');
+// search
+app.get('/home', function(req, res, next) {
+    res.render('home');
+});
+
+app.get('/search', function(req, res, next) {
+    renderSearch(res, {});
+});
+
+app.get('/about', function(req, res, next) {
+    renderSearch(res, {});
+});
+
+app.get('/login', function(req, res, next) {
+    res.render('login', {});
+})
+
+app.get('/artist', function(req, res, next) {
+    renderArtist(res);
 });
 
 // POST
-app.post('/', function(req, res) {
+app.post('/search', function(req, res) {
+    console.log('search');
     var body = req.body;
 
     var res_body = {
@@ -127,4 +146,29 @@ app.post('/', function(req, res) {
     };
 
     renderSearch(res, res_body);
+});
+
+app.post('/login', function(req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
+
+    (async () => {
+        var users = await query('SELECT Type, PID FROM people WHERE Username=\''+username+'\' AND Password=\''+password+'\''); // this seems the best way, then in func get id, rather than get every type
+        if (users.length != 1) {
+            renderError(res);
+            return;
+        } // ...right?
+
+        var user = users[0];
+        console.log(user);
+    
+        if (user.Type == 'artist') // needs to be here because needs to do math
+            renderArtist(res, user.PID);
+        else if (user.Type == 'manager')
+            renderManager(res, user.PID);
+        else if (user.Type == 'customer')
+            renderCustomer(res, user.PID);
+        else
+            renderAdmin(res);   
+    })();
 });
