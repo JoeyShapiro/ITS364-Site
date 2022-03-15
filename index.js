@@ -1,27 +1,28 @@
+// "imports"
 const mysql = require('mysql2');
 const fs = require('fs');
-var express = require('express');
 const exphbs = require('express-handlebars');
 const util = require('util');
+
+// express server
+var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+// settings for express app
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-
 app.engine('hbs', exphbs.engine({
     defaultLayout: 'main',
     extname: '.hbs'
 }));
-
 app.set('view engine', 'hbs');
 
-
+// mysql settings
 var settings = JSON.parse(fs.readFileSync('secret.json', 'utf8')); // could just make this config
-
 const serverCa = [fs.readFileSync("DigiCertGlobalRootCA.crt.pem", 'utf-8')];
 var config =
 {
@@ -38,6 +39,7 @@ var config =
 
 const conn = new mysql.createConnection(config);
 
+// start server
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!');
 });
@@ -46,6 +48,7 @@ app.listen(3000, function () {
 // node native promisify
 const query = util.promisify(conn.query).bind(conn); // no idea what this does, but somehow returns result, rather than that other stuff
 
+// render the page for an artist
 function renderArtist(res) {
     artistID = 1;
 
@@ -62,6 +65,7 @@ function renderArtist(res) {
     })();
 }
 
+// render the page for a manager
 function renderManager(res) {
     ArtistManagerID = 1;
 
@@ -74,6 +78,7 @@ function renderManager(res) {
     })();
 }
 
+// render the page for a customer
 function renderCustomer(res) {
     CustomerID = 1;
 
@@ -84,6 +89,7 @@ function renderCustomer(res) {
     })();
 }
 
+// render the page for searching
 function renderSearch(res, res_body) {
     (async () => {
         res_search = [];
@@ -94,6 +100,7 @@ function renderSearch(res, res_body) {
     })();
 }
 
+// GET
 app.get('/', function (req, res, next) {
     conn.connect();
     pid = 1;
@@ -111,6 +118,7 @@ app.get('/', function (req, res, next) {
         res.render('home');
 });
 
+// POST
 app.post('/', function(req, res) {
     var body = req.body;
 
