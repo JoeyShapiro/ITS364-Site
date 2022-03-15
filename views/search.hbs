@@ -1,0 +1,13 @@
+<form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded">
+    <div class="form-group">
+        <label for="search">Search</label>
+        <input type="text" name="search" id="search" placeholder="instrument">
+    </div>
+</form>
+
+<h2>Search results for: {{res_body.search}}</h2>
+{{#each res_search}}
+    <ul>
+        <li>{{this.FirstName}} {{this.LastName}}</li>
+    </ul>
+{{/each}}

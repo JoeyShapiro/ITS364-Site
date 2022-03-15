@@ -4,8 +4,13 @@ var express = require('express');
 const exphbs = require('express-handlebars');
 const util = require('util');
 var app = express();
+var bodyParser = require('body-parser');
 
 app.use(express.static('public'))
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
 app.engine('hbs', exphbs.engine({
     defaultLayout: 'main',
@@ -13,6 +18,7 @@ app.engine('hbs', exphbs.engine({
 }));
 
 app.set('view engine', 'hbs');
+
 
 var settings = JSON.parse(fs.readFileSync('secret.json', 'utf8')); // could just make this config
 
@@ -40,8 +46,7 @@ app.listen(3000, function () {
 // node native promisify
 const query = util.promisify(conn.query).bind(conn); // no idea what this does, but somehow returns result, rather than that other stuff
 
-app.get('/', function (req, res) {
-    conn.connect();
+function renderArtist(res) {
     artistID = 1;
 
     (async () => {
@@ -49,10 +54,69 @@ app.get('/', function (req, res) {
         schedule = await query("SELECT ArtistScheduleID, StartDate FROM artist_schedule WHERE ArtistID="+ artistID +" AND StartDate > NOW()");
         pays = await query("SELECT a.ArtistID, Total-(Total*(c.Royalty/100))-e.Amount AS 'Payment' FROM invoice INNER JOIN artist a on a.ArtistID = invoice.ArtistID INNER JOIN contract c on a.ArtistID = c.ArtistID INNER JOIN expense e on invoice.ExpenseID = e.ExpenseID WHERE a.ArtistID="+artistID);
         ratings = await query("SELECT rating FROM artist_rating WHERE ArtistID="+artistID);
-        conn.end(); // c48 actually has to close here
+        //conn.end(); // c48 actually has to close here
         user = users[0];
         pay = pays[0];
         rating = ratings[0];
-        res.render('home', {user, schedule, pay, rating});
+        res.render('artist', {user, schedule, pay, rating});
     })();
+}
+
+function renderManager(res) {
+    ArtistManagerID = 1;
+
+    (async () => {
+        users = await query('SELECT * FROM artistmanager WHERE ArtistManagerID='+ArtistManagerID);
+        artists = await query('SELECT artist.ArtistID, artist.FirstName, artist.LastName FROM artist INNER JOIN contract on artist.ArtistID = contract.ArtistID WHERE ArtistManagerID='+ArtistManagerID);
+        //conn.end(); // c48 actually has to close here
+        user = users[0];
+        res.render('manager', {user, artists});
+    })();
+}
+
+function renderCustomer(res) {
+    CustomerID = 1;
+
+    (async () => {
+        //conn.end(); // c48 actually has to close here
+        user = users[0];
+        res.render('customer', {user});
+    })();
+}
+
+function renderSearch(res, res_body) {
+    (async () => {
+        res_search = [];
+        if (res_body != undefined)
+            res_search = await query('SELECT ArtistID, FirstName, LastName, Instruments FROM Artist WHERE Instruments LIKE \'%'+res_body.search+'%\'');
+        //conn.end();
+        res.render('search', {res_body, res_search});
+    })();
+}
+
+app.get('/', function (req, res, next) {
+    conn.connect();
+    pid = 1;
+    user_type = 'search';
+
+    if (user_type == 'artist')
+        renderArtist(res);
+    else if (user_type == 'manager')
+        renderManager(res);
+    else if (user_type == 'customer')
+        renderCustomer(res);
+    else if (user_type == 'search')
+        renderSearch(res, {});
+    else
+        res.render('home');
+});
+
+app.post('/', function(req, res) {
+    var body = req.body;
+
+    var res_body = {
+        search: body.search
+    };
+
+    renderSearch(res, res_body);
 });
