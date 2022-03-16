@@ -26,10 +26,10 @@ app.engine('hbs', exphbs.engine({
 
 app.set('view engine', 'hbs');
 
+// Routes are defined in the controllers/index.js file
+app.use('/', routes);
+
 // start server
 app.listen(3000, function () {
     console.log('FAME Management Web Portal running on port 3000!');
 });
-
-// Routes are defined in the controllers/index.js file
-app.use('/', routes);
