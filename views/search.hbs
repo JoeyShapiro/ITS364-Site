@@ -1,13 +1,20 @@
 <form action="/search" method="post" role="form" enctype="application/x-www-form-urlencoded">
-    <div class="form-group">
-        <label for="search">Search</label>
-        <input type="text" name="search" id="search" placeholder="instrument">
+    <div class="input-group mb-3 mt-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text"><strong>Search by Instrument</strong></span>
+        </div>
+        <input type="text" class="form-control" name="search" id="search" placeholder="Insturment">
     </div>
 </form>
 
-<h2>Search results for: {{res_body.search}}</h2>
+{{#if res_search}}
+<h1>Search results for: "{{res_body.search}}"</h1>
+{{/if}}
 {{#each res_search}}
-    <ul>
-        <li>{{this.FirstName}} {{this.LastName}}</li>
-    </ul>
+    <div class="card mb-3">
+        <h5 class="card-header">{{this.FirstName}} {{this.LastName}}</h5>
+        <div class="card-body">
+            <p class="card-text"><strong>Instruments:</strong> {{this.Instruments}}</p>
+        </div>
+    </div>
 {{/each}}
