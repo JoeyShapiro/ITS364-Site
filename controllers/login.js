@@ -66,7 +66,6 @@ router.post('/', function(req, res) {
         }
 
         let user = users[0];
-        console.log(user);
     
         if (user.Type.toLowerCase() == 'artist') {
             renderArtist(res, user);
