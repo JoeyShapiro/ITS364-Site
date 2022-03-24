@@ -4,9 +4,12 @@ const db = require('../database');
 
 function renderSearch(res, res_body) {
     (async () => {
-        res_search = [];
-        if (res_body != undefined)
+
+        let res_search = [];
+        // If the user submitted a search, then query the database
+        if (res_body != undefined) {
             res_search = await db.query('SELECT ArtistID, FirstName, LastName, Instruments FROM Artist WHERE Instruments LIKE ?', '%' + res_body.search + '%');
+        }
 
         res.render('search', {res_body, res_search});
     })();
@@ -20,7 +23,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res) {
-    console.log('search');
     const body = req.body;
 
     const res_body = {

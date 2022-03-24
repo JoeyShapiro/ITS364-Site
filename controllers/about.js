@@ -6,6 +6,7 @@ const db = require('../database');
 // this is actually the route '/about'
 // even though '/' is the argument used for the route.
 router.get('/', function(req, res, next) {
+    // TODO: Implement about page
     res.render('error', {errorMessage: 'Not implemented'});
 });
 

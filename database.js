@@ -2,6 +2,7 @@ const mysql = require('mysql2');
 const util = require('util');
 const fs = require('fs');
 
+// Read the database credentials and settings from the config file
 const settings = JSON.parse(fs.readFileSync('secret.json', 'utf8'));
 const serverCa = [fs.readFileSync("DigiCertGlobalRootCA.crt.pem", 'utf-8')];
 

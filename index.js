@@ -1,17 +1,34 @@
 // "imports"
 const express = require('express');
+const morgan = require('morgan');
+const commander = require('commander');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
+
 const routes = require('./controllers');
 
-// Magic way to access database (The Node Way™️) (if you wanna know how this works it will probably take a while to explain, but it does work lol)
+
+// Process command-line arguments
+commander
+  .version('0.0.1', '-v, --version')
+  .usage('[OPTIONS]...')
+  .option('-l, --log', 'enable request logging')
+  .parse(process.argv);
+const options = commander.opts();
+
+// Initialize the database connection
 const db = require('./database');
 
-// express server
+// Create the server object
 let app = express();
 
-// settings for express app
-app.use(express.static('public'))
+// Log requests to the server to the console
+if (options.log) {
+    app.use(morgan('dev'));
+}
+
+// Global settings
+app.use(express.static('public'));
 
 app.use(bodyParser.urlencoded({
     extended: true
