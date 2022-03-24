@@ -5,12 +5,7 @@
     "express": "^4.17.3",
     "express-handlebars": "^6.0.3",
     "morgan": "^1.10.0",
-    "mysql": "^2.18.1",
-    "mysql2": "^2.3.3",
-    "pg": "^8.7.3",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.17.0",
-    "tedious": "^14.3.0"
+    "mysql2": "^2.3.3"
   },
   "name": "its364-site",
   "version": "1.0.0",
